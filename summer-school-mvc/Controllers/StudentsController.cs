@@ -40,13 +40,34 @@ namespace summer_school_mvc.Controllers
         {
             return View();
         }
-
-        // POST: Students/Create
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
-        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
+        
+        public void Enrollment()
+        {
+            int? id = null;
+            decimal cost = 200;
+            Student student = db.Students.Find(id);
+            if (student.LastName.ToLower() == "potter")
+            {
+                student.EnrollmentFee = cost / 2;
+                
+            }
+            else if (student.FirstName.ToLower()[0] == student.LastName.ToLower()[0])
+            {
+                student.EnrollmentFee = cost * .9m;
+                
+            }
+            else
+            {
+                student.EnrollmentFee = cost;
+            }
+        }
+       
+// POST: Students/Create
+// To protect from overposting attacks, please enable the specific properties you want to bind to, for 
+// more details see http://go.microsoft.com/fwlink/?LinkId=317598.
+[HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create([Bind(Include = "StudentID,FirstName,LastName,EnrollmentFee")] Student student)
+        public ActionResult Create([Bind(Include = "StudentID,FirstName,LastName")] Student student)
         {
             if (ModelState.IsValid)
             {
