@@ -41,25 +41,30 @@ namespace summer_school_mvc.Controllers
             return View();
         }
         
-        public void Enrollment()
+        public decimal Enrollment()
         {
-            int? id = null;
             decimal cost = 200;
+            int? id = null;
             Student student = db.Students.Find(id);
+            var fee = student.EnrollmentFee;
+            
             if (student.LastName.ToLower() == "potter")
             {
-                student.EnrollmentFee = cost / 2;
+                fee = cost / 2;
+                return fee;
                 
             }
             else if (student.FirstName.ToLower()[0] == student.LastName.ToLower()[0])
             {
-                student.EnrollmentFee = cost * .9m;
-                
+                fee = cost * .9m;
+                return fee;
             }
             else
             {
-                student.EnrollmentFee = cost;
+                fee = cost;
+                return fee;
             }
+
         }
        
 // POST: Students/Create
@@ -67,8 +72,10 @@ namespace summer_school_mvc.Controllers
 // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
 [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create([Bind(Include = "StudentID,FirstName,LastName")] Student student)
+        public ActionResult Create([Bind(Include = "StudentID,FirstName,LastName,EnrollmentFee")] Student student)
         {
+            student.EnrollmentFee = Enrollment();
+
             if (ModelState.IsValid)
             {
                 db.Students.Add(student);
