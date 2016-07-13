@@ -41,18 +41,21 @@ namespace summer_school_mvc.Controllers
             return View();
         }
         
-        public decimal Enrollment()
+        public decimal Enrollment(Student student)
         {
             decimal cost = 200;
-            int? id = null;
-            Student student = db.Students.Find(id);
-            var fee = student.EnrollmentFee;
+            var fee = cost;
             
             if (student.LastName.ToLower() == "potter")
             {
                 fee = cost / 2;
                 return fee;
                 
+            }
+            else if (student.LastName.ToLower() == "longbottom" && db.Students.Count() < 10)
+            {
+                fee = 0;
+                return fee;
             }
             else if (student.FirstName.ToLower()[0] == student.LastName.ToLower()[0])
             {
@@ -61,25 +64,37 @@ namespace summer_school_mvc.Controllers
             }
             else
             {
-                fee = cost;
                 return fee;
             }
 
         }
-       
-// POST: Students/Create
-// To protect from overposting attacks, please enable the specific properties you want to bind to, for 
-// more details see http://go.microsoft.com/fwlink/?LinkId=317598.
-[HttpPost]
+
+        public decimal TotalFees(Student student)
+        {
+            decimal runningTotal = 0;
+
+            foreach (decimal studentFee in Convert.ToString(student.EnrollmentFee))
+            {
+                runningTotal = runningTotal + studentFee;
+            }
+            return runningTotal;
+        }
+
+        // POST: Students/Create
+        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
+        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult Create([Bind(Include = "StudentID,FirstName,LastName,EnrollmentFee")] Student student)
         {
-            student.EnrollmentFee = Enrollment();
-
+           
             if (ModelState.IsValid)
             {
                 db.Students.Add(student);
+                student.EnrollmentFee = Enrollment(student);
+                decimal enrollmentSum = TotalFees(student);
                 db.SaveChanges();
+
                 return RedirectToAction("Index");
             }
 

@@ -22,3 +22,16 @@ select,
 textarea {
     max-width: 280px;
 }
+.jumbotron {
+    background-image: url('harry-potter.jpg');
+    background-size: cover;
+    background-position: top center;
+    opacity: 0.6;
+    color: #ffffff;
+    
+}
+.jumbotron h1{
+    font-family: Impact;
+    text-shadow: 3px 6px 2px #000000;
+}
+
