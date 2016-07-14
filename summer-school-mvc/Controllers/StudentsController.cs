@@ -52,12 +52,12 @@ namespace summer_school_mvc.Controllers
                 return fee;
                 
             }
-            else if (student.LastName.ToLower() == "longbottom" && db.Students.Count() < 10)
+            if (student.LastName.ToLower() == "longbottom" && db.Students.Count() < 10)
             {
                 fee = 0;
                 return fee;
             }
-            else if (student.FirstName.ToLower()[0] == student.LastName.ToLower()[0])
+            if (student.FirstName.ToLower()[0] == student.LastName.ToLower()[0])
             {
                 fee = cost * .9m;
                 return fee;
