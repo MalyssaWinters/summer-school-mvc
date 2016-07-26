@@ -17,6 +17,8 @@ namespace summer_school_mvc.Controllers
         // GET: Students
         public ActionResult Index()
         {
+            //allows us to change the index view
+            ViewBag.TotalEnrollmentFee = TotalFees();
             return View(db.Students.ToList());
         }
 
@@ -69,13 +71,13 @@ namespace summer_school_mvc.Controllers
 
         }
 
-        public decimal TotalFees(Student student)
+        public decimal TotalFees()
         {
             decimal runningTotal = 0;
 
-            foreach (decimal studentFee in Convert.ToString(student.EnrollmentFee))
+            foreach (Student student in db.Students)
             {
-                runningTotal = runningTotal + studentFee;
+                runningTotal = runningTotal + student.EnrollmentFee;
             }
             return runningTotal;
         }
@@ -85,14 +87,13 @@ namespace summer_school_mvc.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create([Bind(Include = "StudentID,FirstName,LastName,EnrollmentFee")] Student student)
+        public ActionResult Create([Bind(Include = "StudentID,FirstName,LastName")] Student student)
         {
            
             if (ModelState.IsValid)
             {
                 db.Students.Add(student);
                 student.EnrollmentFee = Enrollment(student);
-                decimal enrollmentSum = TotalFees(student);
                 db.SaveChanges();
 
                 return RedirectToAction("Index");
