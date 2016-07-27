@@ -17,6 +17,7 @@ namespace summer_school_mvc.Controllers
         // GET: Students
         public ActionResult Index(string searchString)
         {
+<<<<<<< HEAD
             var students = from item in db.Students
                            select item;
 
@@ -33,6 +34,11 @@ namespace summer_school_mvc.Controllers
             ViewBag.MaximumEnrollment = 15;
             return View(students);
 
+=======
+            //allows us to change the index view
+            ViewBag.TotalEnrollmentFee = TotalFees();
+            return View(db.Students.ToList());
+>>>>>>> 5eea4981698bb49caab226ca3b10afa5ee1953d2
         }
 
         // GET: Students/Details/5
@@ -74,9 +80,17 @@ namespace summer_school_mvc.Controllers
             }
             return (int)cost;
         }
+<<<<<<< HEAD
         public decimal totalFees()
         {
             decimal runningTotal = 0;
+=======
+
+        public decimal TotalFees()
+        {
+            decimal runningTotal = 0;
+
+>>>>>>> 5eea4981698bb49caab226ca3b10afa5ee1953d2
             foreach (Student student in db.Students)
             {
                 runningTotal = runningTotal + student.EnrollmentFee;
@@ -96,6 +110,10 @@ namespace summer_school_mvc.Controllers
             if (ModelState.IsValid)
             {
                 db.Students.Add(student);
+<<<<<<< HEAD
+=======
+                student.EnrollmentFee = Enrollment(student);
+>>>>>>> 5eea4981698bb49caab226ca3b10afa5ee1953d2
                 db.SaveChanges();
 
                 return RedirectToAction("Index");
