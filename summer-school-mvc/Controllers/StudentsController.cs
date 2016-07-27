@@ -117,7 +117,7 @@ namespace summer_school_mvc.Controllers
                 db.SaveChanges();
 
                 string combinedName = (student.FirstName + student.LastName).ToLower();
-                if (combinedName.Contains("tom") || combinedName.Contains("voldemort"))
+                if (combinedName.Contains("riddle") || combinedName.Contains("voldemort"))
                 {
                     return View("Voldemort");
                 }
