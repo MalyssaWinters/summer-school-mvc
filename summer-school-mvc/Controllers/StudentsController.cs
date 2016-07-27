@@ -14,6 +14,8 @@ namespace summer_school_mvc.Controllers
     {
         private SummerSchoolMVCEntities db = new SummerSchoolMVCEntities();
 
+        private int MaximumEnrollment = 15;
+
         // GET: Students
         public ActionResult Index(string searchString)
         {
@@ -30,7 +32,7 @@ namespace summer_school_mvc.Controllers
 
             //allows us to change the index view
             ViewBag.TotalEnrollmentFee = totalFees();
-            ViewBag.MaximumEnrollment = 15;
+            ViewBag.MaximumEnrollment = MaximumEnrollment;
             ViewBag.CurrentEnrollment = db.Students.Count();
 
             return View(students);
@@ -38,23 +40,27 @@ namespace summer_school_mvc.Controllers
         }
 
         // GET: Students/Details/5
-        public ActionResult Details(int? id)
-        {
-            if (id == null)
-            {
-                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
-            }
-            Student student = db.Students.Find(id);
-            if (student == null)
-            {
-                return HttpNotFound();
-            }
-            return View(student);
-        }
+        //public ActionResult Details(int? id)
+        //{
+        //    if (id == null)
+        //    {
+        //        return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+        //    }
+        //    Student student = db.Students.Find(id);
+        //    if (student == null)
+        //    {
+        //        return HttpNotFound();
+        //    }
+        //    return View(student);
+        //}
 
         // GET: Students/Create
         public ActionResult Create()
         {
+            if (db.Students.Count() >= MaximumEnrollment)
+            {
+                return RedirectToAction("Index");
+            }
             return View();
         }
 
@@ -85,7 +91,7 @@ namespace summer_school_mvc.Controllers
             }
             return runningTotal;
         }
-        
+
         // POST: Students/Create
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
@@ -93,12 +99,28 @@ namespace summer_school_mvc.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult Create([Bind(Include = "StudentID,FirstName,LastName")] Student student)
         {
+            if (db.Students.Count() >= MaximumEnrollment)
+            {
+                return RedirectToAction("Index");
+            }
+            if (student.LastName.ToLower() == ("malfoy"))
+            {
+                return View("Malfoy");
+            }
+            
+      
             student.EnrollmentFee = EnrollStudent(student.FirstName, student.LastName);
 
             if (ModelState.IsValid)
             {
                 db.Students.Add(student);
                 db.SaveChanges();
+
+                string combinedName = (student.FirstName + student.LastName).ToLower();
+                if (combinedName.Contains("tom") || combinedName.Contains("voldemort"))
+                {
+                    return View("Voldemort");
+                }
 
                 return RedirectToAction("Index");
             }
