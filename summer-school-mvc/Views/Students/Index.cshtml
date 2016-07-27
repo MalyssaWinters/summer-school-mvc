@@ -6,9 +6,25 @@
 
 <h2>Enroll Student</h2>
 
+@*shows/hides enroll link*@
 <p>
-    @Html.ActionLink("Click here to enroll", "Create")
+    @if (Model.Count() < ViewBag.MaximumEnrollment)
+    {
+        @Html.ActionLink("Click here to enroll", "Create")
+    }
+    else
+    {
+        <span>Enrollment is closed.</span>
+    }
 </p>
+
+@using (Html.BeginForm())
+{
+    <p>
+        Search for: @Html.TextBox("searchString")
+        <input type="submit" value="Search" />
+    </p>
+}
 <table class="table">
     <tr>
         <th>
@@ -23,24 +39,29 @@
         <th></th>
     </tr>
 
-@foreach (var item in Model) {
-    <tr>
-        <td>
-            @Html.DisplayFor(modelItem => item.FirstName)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.LastName)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.EnrollmentFee)
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.FirstName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.LastName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.EnrollmentFee)
 
-        </td>
-        <td>
-            @Html.ActionLink("Edit", "Edit", new { id=item.StudentID }) |
-            @Html.ActionLink("Details", "Details", new { id=item.StudentID }) |
-            @Html.ActionLink("Delete", "Delete", new { id=item.StudentID })
-        </td>
-    </tr>
-}
+            </td>
+            <td>
+                @Html.ActionLink("Edit", "Edit", new { id = item.StudentID }) |
+                @Html.ActionLink("Details", "Details", new { id = item.StudentID }) |
+                @Html.ActionLink("Delete", "Delete", new { id = item.StudentID })
+            </td>
+        </tr>
+    }
 
 </table>
+
+<div class="student-total">
+    <b class="amount-label">Total Student Enrollment:</b> <span class="amount">@String.Format("{0:C}", ViewBag.TotalEnrollmentFee)</span>
+</div>

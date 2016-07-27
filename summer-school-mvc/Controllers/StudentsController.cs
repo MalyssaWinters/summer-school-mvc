@@ -15,9 +15,24 @@ namespace summer_school_mvc.Controllers
         private SummerSchoolMVCEntities db = new SummerSchoolMVCEntities();
 
         // GET: Students
-        public ActionResult Index()
+        public ActionResult Index(string searchString)
         {
-            return View(db.Students.ToList());
+            var students = from item in db.Students
+                           select item;
+
+            if (!String.IsNullOrEmpty(searchString))
+            {
+                students = from item in students
+                           where item.LastName.Contains(searchString) ||
+                                 item.FirstName.Contains(searchString)
+                           select item;
+            }
+
+            //allows us to change the index view
+            ViewBag.TotalEnrollmentFee = totalFees();
+            ViewBag.MaximumEnrollment = 15;
+            return View(students);
+
         }
 
         // GET: Students/Details/5
@@ -40,59 +55,47 @@ namespace summer_school_mvc.Controllers
         {
             return View();
         }
-        
-        public decimal Enrollment(Student student)
+
+        int EnrollStudent(string firstName, string lastName)
         {
-            decimal cost = 200;
-            var fee = cost;
-            
-            if (student.LastName.ToLower() == "potter")
+            double cost = 200;
+            if (lastName.ToLower() == "potter")
             {
-                fee = cost / 2;
-                return fee;
-                
+                cost *= 0.5;
             }
-            if (student.LastName.ToLower() == "longbottom" && db.Students.Count() < 10)
+            int numberOfStudents = db.Students.Count();
+            if (lastName.ToLower() == "longbottom" && numberOfStudents <= 10)
             {
-                fee = 0;
-                return fee;
+                cost = 0;
             }
-            if (student.FirstName.ToLower()[0] == student.LastName.ToLower()[0])
+            if (firstName.ToLower()[0] == lastName.ToLower()[0])
             {
-                fee = cost * .9m;
-                return fee;
+                cost = 0.9 * cost;
             }
-            else
-            {
-                return fee;
-            }
-
+            return (int)cost;
         }
-
-        public decimal TotalFees(Student student)
+        public decimal totalFees()
         {
             decimal runningTotal = 0;
-
-            foreach (decimal studentFee in Convert.ToString(student.EnrollmentFee))
+            foreach (Student student in db.Students)
             {
-                runningTotal = runningTotal + studentFee;
+                runningTotal = runningTotal + student.EnrollmentFee;
             }
             return runningTotal;
         }
-
+        
         // POST: Students/Create
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create([Bind(Include = "StudentID,FirstName,LastName,EnrollmentFee")] Student student)
+        public ActionResult Create([Bind(Include = "StudentID,FirstName,LastName")] Student student)
         {
-           
+            student.EnrollmentFee = EnrollStudent(student.FirstName, student.LastName);
+
             if (ModelState.IsValid)
             {
                 db.Students.Add(student);
-                student.EnrollmentFee = Enrollment(student);
-                decimal enrollmentSum = TotalFees(student);
                 db.SaveChanges();
 
                 return RedirectToAction("Index");
